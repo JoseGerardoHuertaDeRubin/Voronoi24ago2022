@@ -1,0 +1,46 @@
+%MAPA DE VORONOI
+
+clear all
+close all
+clc
+
+mapa = zeros(256); %Es para el mapa, en ceros para luego tener el mapa
+puntos = []; %Es para los puntos, va a organizar los puntos y sus colores
+
+%Creación de puntos aleatorios y asignación de colores
+
+for c = 1:16 %Los 16 puntos
+    x = randi(256); %Coordenada x del punto
+    y = randi(256); %Coordenada y del punto
+    color = c*16; %Color según punto
+    mapa(x,y) = c; %Ubica el punto en el mapa voronoi
+    punto = [x,y,color]; %Asigna color a cada punto
+    puntos = [puntos;punto]; %Agrega los nuevos puntos
+end
+
+%Medición de distancias y coloración de pixeles
+
+dmin = 256; %Es el tamaño del mapa, para ir comparando después
+[imax,jmax] = size(mapa); %Para llegar hasta los límites del mapa (generaliza el 256)
+
+for i = 1:imax %Para que recorra todo el eje x
+    for j = 1:jmax %Para que recorra todo el eje y
+        for k = ctranspose(puntos) %Transponer para que tome los datos de cada punto (toma 3 datos en vez de 16)
+            x1 = i; %Coordenada x del pixel actual
+            y1 = j; %Coordenada y del pixel actual
+            x2 = k(1); %Coordenada x del punto aleatorio
+            y2 = k(2); %Coordenada y del punto aleatorio
+            d = sqrt(((x1-x2)^2)+((y2-y1)^2)); %Distancia euclidiana entre puntos
+            if d < dmin %Nueva distancia contra menor distancia anterior
+                dmin = d; %Para que la menor de las distancias se vuelva el nuevo referente
+                mapa(i,j) = k(3); %Le da el color del punto al pixel
+            end
+        end
+        dmin = 256; %Regresa a la distancia original a comparar para el resto de pixeles
+    end
+end
+
+%Proyección de las imágenes
+
+imshow(uint8(mapa)) %Muestra el mapa en blanco y negro
+mesh(mapa) %Muestra el mapa a color, hay que girarlo porque está en 3D
